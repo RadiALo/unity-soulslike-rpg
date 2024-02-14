@@ -5,13 +5,34 @@ using UnityEngine;
 public abstract class PlayerState
 {
     protected Player player;
+    
+    protected string animatorBoolName;
 
-    public PlayerState(Player player)
+    protected float xInput;
+
+    public PlayerState(Player player, string animatorBoolName)
     {
         this.player = player;
+        this.animatorBoolName = animatorBoolName;
     }
 
-    public virtual void Enter() { }
-    public virtual void Update() { }
-    public virtual void Exit() { }
+    private void ToggleAnimator(bool toggle)
+    {
+        player.animator.SetBool(animatorBoolName, toggle);
+    }
+
+    public virtual void Enter() {
+        ToggleAnimator(true);
+    }
+
+    public virtual void Update() {
+        xInput = Input.GetAxis("Horizontal");
+        player.FlipController(xInput);
+        player.animator.SetFloat("yVelocity", player.rigidbody.velocity.y);
+    }
+
+    public virtual void Exit()
+    {
+        ToggleAnimator(false);
+    }
 }
