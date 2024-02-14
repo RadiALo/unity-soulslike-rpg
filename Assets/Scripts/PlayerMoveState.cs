@@ -12,11 +12,6 @@ public class PlayerMoveState : PlayerGroundedState
     {
         base.Update();
 
-        player.rigidbody.velocity = new Vector2(
-            xInput * player.moveSpeed,
-            player.rigidbody.velocity.y
-        );
-
         if (xInput == 0)
         {
             player.stateMachine.ChangeState(player.idleState);

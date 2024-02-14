@@ -7,6 +7,10 @@ public class Player : MonoBehaviour
     [Header("Move info")]
     public float moveSpeed = 12f;
     public float jumpForce = 12f;
+    public float dashSpeed = 24f;
+    public float dashDuration = 0.4f;
+    [SerializeField] private float dashCouldown = 2f;
+    private float dashCouldownTimer = 0f;
     [Header("Collision info")]
     [SerializeField] private Transform groundCheck;
     [SerializeField] private float groundCheckDistance;
@@ -14,9 +18,10 @@ public class Player : MonoBehaviour
     [SerializeField] private float wallCheckDistance;
     [SerializeField] private LayerMask groundMask;
 
+    public bool CanDash { get => dashCouldownTimer < 0f; }
     public bool IsGrounded { get => Physics2D.Raycast(groundCheck.position, Vector2.down, groundCheckDistance, groundMask); }
 
-    private bool isFacingRight = true;
+    public bool IsFacingRight = true;
 
     #region COMPONENTS
 
@@ -37,6 +42,8 @@ public class Player : MonoBehaviour
 
     public PlayerAirState airState { get; private set; }
 
+    public PlayerDashState dashState { get; private set; }
+
     #endregion
 
     private void Awake()
@@ -47,6 +54,7 @@ public class Player : MonoBehaviour
         moveState = new PlayerMoveState(this, "Move");
         jumpState = new PlayerJumpState(this, "Jump");
         airState = new PlayerAirState(this, "Jump");
+        dashState = new PlayerDashState(this, "Dash");
     }
 
     private void Start()
@@ -59,23 +67,30 @@ public class Player : MonoBehaviour
     private void Update()
     {
         stateMachine.CurrentState.Update();
+
+        dashCouldownTimer -= Time.deltaTime;
     }
 
-    private void Flip()
+    public void ReloadDash()
     {
-        isFacingRight = !isFacingRight;
-        transform.Rotate(0, 180, 0);
+        dashCouldownTimer = dashCouldown;
     }
 
     public void FlipController(float x)
     {
-        if (x > 0 && !isFacingRight)
+        if (x > 0 && !IsFacingRight)
         {
             Flip();
-        } else if (x < 0 && isFacingRight)
+        } else if (x < 0 && IsFacingRight)
         {
             Flip();
         }
+    }
+    
+    private void Flip()
+    {
+        IsFacingRight = !IsFacingRight;
+        transform.Rotate(0, 180, 0);
     }
 
     private void OnDrawGizmos()

@@ -29,6 +29,11 @@ public abstract class PlayerState
         xInput = Input.GetAxis("Horizontal");
         player.FlipController(xInput);
         player.animator.SetFloat("yVelocity", player.rigidbody.velocity.y);
+
+        if (Input.GetKeyDown(KeyCode.LeftShift) && player.CanDash)
+        {
+            player.stateMachine.ChangeState(player.dashState);
+        }
     }
 
     public virtual void Exit()

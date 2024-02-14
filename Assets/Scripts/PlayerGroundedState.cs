@@ -22,6 +22,16 @@ public class PlayerGroundedState : PlayerState
     {
         base.Update();
 
+        player.rigidbody.velocity = new Vector2(
+            xInput * player.moveSpeed,
+            player.rigidbody.velocity.y
+        );
+
+        if (!player.IsGrounded)
+        {
+            player.stateMachine.ChangeState(player.airState);
+        }
+
         if (Input.GetKeyDown(KeyCode.Space) && player.IsGrounded)
         {
             player.stateMachine.ChangeState(player.jumpState);
